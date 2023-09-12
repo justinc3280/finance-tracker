@@ -1,0 +1,29 @@
+enum AccountType {
+  CHECKING
+  SAVINGS
+  BROKERAGE
+  CREDIT_CARD
+  ONLINE
+}
+
+type Category @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+}
+
+type Transaction @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  accountID: ID! @index(name: "byAccount")
+  date: AWSDate!
+  description: String!
+  amount: Float!
+  Category: Category @hasOne
+}
+
+type Account @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  name: String!
+  startingBalance: Float!
+  Transactions: [Transaction] @hasMany(indexName: "byAccount", fields: ["id"])
+  type: AccountType!
+}
