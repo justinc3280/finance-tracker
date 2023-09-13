@@ -27,3 +27,4 @@ type Account @model @auth(rules: [{allow: public}]) {
   Transactions: [Transaction] @hasMany(indexName: "byAccount", fields: ["id"])
   type: AccountType!
 }
+ 
