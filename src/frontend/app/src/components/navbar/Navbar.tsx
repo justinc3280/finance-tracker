@@ -18,18 +18,18 @@ const Navbar: React.FC = () => {
         <BsNavbar.Toggle aria-controls="navbarDropdown" />
         <BsNavbar.Collapse id="navbarDropdown">
           <Nav>
-            <Nav.Link>
+            <BsNavbar.Text>
               <Link className={styles["link"]} to="/accounts">Accounts</Link>
-            </Nav.Link>
-            <Nav.Link>
+            </BsNavbar.Text>
+            <BsNavbar.Text>
               <Link className={styles["link"]} to="/paychecks">Paychecks</Link>
-            </Nav.Link>
-            <Nav.Link>
+            </BsNavbar.Text>
+            <BsNavbar.Text>
               <Link className={styles["link"]} to="/transactions">Transactions</Link>
-            </Nav.Link>
-            <Nav.Link>
+            </BsNavbar.Text>
+            <BsNavbar.Text>
               <Link className={styles["link"]} to="/categories">Categories</Link>
-            </Nav.Link>
+            </BsNavbar.Text>
           </Nav>
         </BsNavbar.Collapse>
 
