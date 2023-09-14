@@ -1,6 +1,6 @@
 import React from 'react';
-
 import Navbar from '../navbar/Navbar';
+import styles from './Page.module.scss';
 
 type Props = {
   children?: React.ReactNode;
@@ -8,9 +8,11 @@ type Props = {
 
 const Page: React.FC<Props> = ({ children }) => {
   return (
-    <div>
+    <div className={styles["container"]}>
       <Navbar />
-      {children}
+      <div className={styles["content"]}>
+        {children}
+      </div>
     </div>
   );
 };

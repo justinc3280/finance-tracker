@@ -1,0 +1,13 @@
+@import 'src/styles/variables';
+
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: $app-bg-color;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 1rem 1rem;
+}
