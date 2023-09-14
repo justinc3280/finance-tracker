@@ -12,6 +12,7 @@ import {
   Grid,
   SelectField,
   TextField,
+  useTheme,
 } from "@aws-amplify/ui-react";
 import { getOverrideProps } from "@aws-amplify/ui-react/internal";
 import { Account } from "../models";
@@ -28,6 +29,7 @@ export default function AccountCreateForm(props) {
     overrides,
     ...rest
   } = props;
+  const { tokens } = useTheme();
   const initialValues = {
     name: "",
     startingBalance: "",
@@ -70,9 +72,9 @@ export default function AccountCreateForm(props) {
   return (
     <Grid
       as="form"
-      rowGap="15px"
-      columnGap="15px"
-      padding="20px"
+      rowGap={tokens.space.medium.value}
+      columnGap={tokens.space.small.value}
+      padding={tokens.space.large.value}
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
@@ -236,21 +238,12 @@ export default function AccountCreateForm(props) {
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
       >
-        <Button
-          children="Clear"
-          type="reset"
-          onClick={(event) => {
-            event.preventDefault();
-            resetStateValues();
-          }}
-          {...getOverrideProps(overrides, "ClearButton")}
-        ></Button>
         <Flex
-          gap="15px"
+          gap={tokens.space.small.value}
           {...getOverrideProps(overrides, "RightAlignCTASubFlex")}
         >
           <Button
-            children="Submit"
+            children="Create"
             type="submit"
             variation="primary"
             isDisabled={Object.values(errors).some((e) => e?.hasError)}
