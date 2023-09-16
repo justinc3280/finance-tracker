@@ -3,6 +3,7 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
+import AccountPage from './components/pages/account-page/AccountPage';
 import AccountsPage from './components/pages/accounts-page/AccountsPage';
 import CategoriesPage from './components/pages/categories-page/CategoriesPage';
 import PaychecksPage from './components/pages/paychecks-page/PaychecksPage';
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
   {
     path: "/accounts",
     element: <AccountsPage />,
+  },
+  {
+    path: "/account/:accountID",
+    element: <AccountPage />
   },
   {
     path: "/paychecks",

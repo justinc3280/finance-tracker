@@ -1,4 +1,5 @@
 import React from 'react';
+import Container from 'react-bootstrap/Container';
 import Navbar from '../navbar/Navbar';
 import styles from './Page.module.scss';
 
@@ -10,9 +11,9 @@ const Page: React.FC<Props> = ({ children }) => {
   return (
     <div className={styles["container"]}>
       <Navbar />
-      <div className={styles["content"]}>
+      <Container fluid className={styles["content"]}>
         {children}
-      </div>
+      </Container>
     </div>
   );
 };
