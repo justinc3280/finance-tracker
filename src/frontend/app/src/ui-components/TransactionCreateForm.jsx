@@ -15,7 +15,6 @@ import {
   Grid,
   Icon,
   ScrollView,
-  SelectField,
   Text,
   TextField,
   useTheme,
@@ -24,7 +23,7 @@ import {
   getOverrideProps,
   useDataStoreBinding,
 } from "@aws-amplify/ui-react/internal";
-import { Account, Transaction } from "../models";
+import { Transaction, Category as Category0, Account } from "../models";
 import { fetchByPath, validateField } from "./utils";
 import { DataStore } from "aws-amplify";
 function ArrayField({
@@ -182,10 +181,9 @@ function ArrayField({
     </React.Fragment>
   );
 }
-export default function AccountUpdateForm(props) {
+export default function TransactionCreateForm(props) {
   const {
-    id: idProp,
-    account: accountModelProp,
+    clearOnSuccess = true,
     onSuccess,
     onError,
     onSubmit,
@@ -195,75 +193,68 @@ export default function AccountUpdateForm(props) {
     ...rest
   } = props;
   const initialValues = {
-    name: "",
-    startingBalance: "",
-    Transactions: [],
-    type: "",
+    date: "",
+    description: "",
+    amount: "",
+    accountID: undefined,
+    Category: undefined,
   };
-  const [name, setName] = React.useState(initialValues.name);
-  const [startingBalance, setStartingBalance] = React.useState(
-    initialValues.startingBalance
+  const [date, setDate] = React.useState(initialValues.date);
+  const [description, setDescription] = React.useState(
+    initialValues.description
   );
-  const [Transactions, setTransactions] = React.useState(
-    initialValues.Transactions
-  );
-  const [type, setType] = React.useState(initialValues.type);
+  const [amount, setAmount] = React.useState(initialValues.amount);
+  const [accountID, setAccountID] = React.useState(initialValues.accountID);
+  const [Category, setCategory] = React.useState(initialValues.Category);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
-    const cleanValues = accountRecord
-      ? { ...initialValues, ...accountRecord, Transactions: linkedTransactions }
-      : initialValues;
-    setName(cleanValues.name);
-    setStartingBalance(cleanValues.startingBalance);
-    setTransactions(cleanValues.Transactions ?? []);
-    setCurrentTransactionsValue(undefined);
-    setCurrentTransactionsDisplayValue("");
-    setType(cleanValues.type);
+    setDate(initialValues.date);
+    setDescription(initialValues.description);
+    setAmount(initialValues.amount);
+    setAccountID(initialValues.accountID);
+    setCurrentAccountIDValue(undefined);
+    setCurrentAccountIDDisplayValue("");
+    setCategory(initialValues.Category);
+    setCurrentCategoryValue(undefined);
+    setCurrentCategoryDisplayValue("");
     setErrors({});
   };
-  const [accountRecord, setAccountRecord] = React.useState(accountModelProp);
-  const [linkedTransactions, setLinkedTransactions] = React.useState([]);
-  const canUnlinkTransactions = false;
-  React.useEffect(() => {
-    const queryData = async () => {
-      const record = idProp
-        ? await DataStore.query(Account, idProp)
-        : accountModelProp;
-      setAccountRecord(record);
-      const linkedTransactions = record
-        ? await record.Transactions.toArray()
-        : [];
-      setLinkedTransactions(linkedTransactions);
-    };
-    queryData();
-  }, [idProp, accountModelProp]);
-  React.useEffect(resetStateValues, [accountRecord, linkedTransactions]);
-  const [currentTransactionsDisplayValue, setCurrentTransactionsDisplayValue] =
+  const [currentAccountIDDisplayValue, setCurrentAccountIDDisplayValue] =
     React.useState("");
-  const [currentTransactionsValue, setCurrentTransactionsValue] =
+  const [currentAccountIDValue, setCurrentAccountIDValue] =
     React.useState(undefined);
-  const TransactionsRef = React.createRef();
+  const accountIDRef = React.createRef();
+  const [currentCategoryDisplayValue, setCurrentCategoryDisplayValue] =
+    React.useState("");
+  const [currentCategoryValue, setCurrentCategoryValue] =
+    React.useState(undefined);
+  const CategoryRef = React.createRef();
   const getIDValue = {
-    Transactions: (r) => JSON.stringify({ id: r?.id }),
+    Category: (r) => JSON.stringify({ id: r?.id }),
   };
-  const TransactionsIdSet = new Set(
-    Array.isArray(Transactions)
-      ? Transactions.map((r) => getIDValue.Transactions?.(r))
-      : getIDValue.Transactions?.(Transactions)
+  const CategoryIdSet = new Set(
+    Array.isArray(Category)
+      ? Category.map((r) => getIDValue.Category?.(r))
+      : getIDValue.Category?.(Category)
   );
-  const transactionRecords = useDataStoreBinding({
+  const accountRecords = useDataStoreBinding({
     type: "collection",
-    model: Transaction,
+    model: Account,
+  }).items;
+  const categoryRecords = useDataStoreBinding({
+    type: "collection",
+    model: Category0,
   }).items;
   const getDisplayValue = {
-    Transactions: (r) =>
-      `${r?.description ? r?.description + " - " : ""}${r?.id}`,
+    accountID: (r) => `${r?.name ? r?.name + " - " : ""}${r?.id}`,
+    Category: (r) => `${r?.name ? r?.name + " - " : ""}${r?.id}`,
   };
   const validations = {
-    name: [{ type: "Required" }],
-    startingBalance: [{ type: "Required" }],
-    Transactions: [],
-    type: [{ type: "Required" }],
+    date: [{ type: "Required" }],
+    description: [{ type: "Required" }],
+    amount: [{ type: "Required" }],
+    accountID: [{ type: "Required" }],
+    Category: [],
   };
   const runValidationTasks = async (
     fieldName,
@@ -291,10 +282,11 @@ export default function AccountUpdateForm(props) {
       onSubmit={async (event) => {
         event.preventDefault();
         let modelFields = {
-          name,
-          startingBalance,
-          Transactions,
-          type,
+          date,
+          description,
+          amount,
+          accountID,
+          Category,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -332,65 +324,12 @@ export default function AccountUpdateForm(props) {
               modelFields[key] = null;
             }
           });
-          const promises = [];
-          const transactionsToLink = [];
-          const transactionsToUnLink = [];
-          const transactionsSet = new Set();
-          const linkedTransactionsSet = new Set();
-          Transactions.forEach((r) =>
-            transactionsSet.add(getIDValue.Transactions?.(r))
-          );
-          linkedTransactions.forEach((r) =>
-            linkedTransactionsSet.add(getIDValue.Transactions?.(r))
-          );
-          linkedTransactions.forEach((r) => {
-            if (!transactionsSet.has(getIDValue.Transactions?.(r))) {
-              transactionsToUnLink.push(r);
-            }
-          });
-          Transactions.forEach((r) => {
-            if (!linkedTransactionsSet.has(getIDValue.Transactions?.(r))) {
-              transactionsToLink.push(r);
-            }
-          });
-          transactionsToUnLink.forEach((original) => {
-            if (!canUnlinkTransactions) {
-              throw Error(
-                `Transaction ${original.id} cannot be unlinked from Account because accountID is a required field.`
-              );
-            }
-            promises.push(
-              DataStore.save(
-                Transaction.copyOf(original, (updated) => {
-                  updated.accountID = null;
-                })
-              )
-            );
-          });
-          transactionsToLink.forEach((original) => {
-            promises.push(
-              DataStore.save(
-                Transaction.copyOf(original, (updated) => {
-                  updated.accountID = accountRecord.id;
-                })
-              )
-            );
-          });
-          const modelFieldsToSave = {
-            name: modelFields.name,
-            startingBalance: modelFields.startingBalance,
-            type: modelFields.type,
-          };
-          promises.push(
-            DataStore.save(
-              Account.copyOf(accountRecord, (updated) => {
-                Object.assign(updated, modelFieldsToSave);
-              })
-            )
-          );
-          await Promise.all(promises);
+          await DataStore.save(new Transaction(modelFields));
           if (onSuccess) {
             onSuccess(modelFields);
+          }
+          if (clearOnSuccess) {
+            resetStateValues();
           }
         } catch (err) {
           if (onError) {
@@ -398,212 +337,276 @@ export default function AccountUpdateForm(props) {
           }
         }
       }}
-      {...getOverrideProps(overrides, "AccountUpdateForm")}
+      {...getOverrideProps(overrides, "TransactionCreateForm")}
       {...rest}
     >
       <TextField
-        label="Name"
+        label="Date"
         isRequired={true}
         isReadOnly={false}
-        value={name}
+        type="date"
+        value={date}
         onChange={(e) => {
           let { value } = e.target;
           if (onChange) {
             const modelFields = {
-              name: value,
-              startingBalance,
-              Transactions,
-              type,
+              date: value,
+              description,
+              amount,
+              accountID,
+              Category,
             };
             const result = onChange(modelFields);
-            value = result?.name ?? value;
+            value = result?.date ?? value;
           }
-          if (errors.name?.hasError) {
-            runValidationTasks("name", value);
+          if (errors.date?.hasError) {
+            runValidationTasks("date", value);
           }
-          setName(value);
+          setDate(value);
         }}
-        onBlur={() => runValidationTasks("name", name)}
-        errorMessage={errors.name?.errorMessage}
-        hasError={errors.name?.hasError}
-        {...getOverrideProps(overrides, "name")}
+        onBlur={() => runValidationTasks("date", date)}
+        errorMessage={errors.date?.errorMessage}
+        hasError={errors.date?.hasError}
+        {...getOverrideProps(overrides, "date")}
       ></TextField>
       <TextField
-        label="Starting balance"
+        label="Description"
+        isRequired={true}
+        isReadOnly={false}
+        value={description}
+        onChange={(e) => {
+          let { value } = e.target;
+          if (onChange) {
+            const modelFields = {
+              date,
+              description: value,
+              amount,
+              accountID,
+              Category,
+            };
+            const result = onChange(modelFields);
+            value = result?.description ?? value;
+          }
+          if (errors.description?.hasError) {
+            runValidationTasks("description", value);
+          }
+          setDescription(value);
+        }}
+        onBlur={() => runValidationTasks("description", description)}
+        errorMessage={errors.description?.errorMessage}
+        hasError={errors.description?.hasError}
+        {...getOverrideProps(overrides, "description")}
+      ></TextField>
+      <TextField
+        label="Amount"
         isRequired={true}
         isReadOnly={false}
         type="number"
         step="any"
-        value={startingBalance}
+        value={amount}
         onChange={(e) => {
           let value = isNaN(parseFloat(e.target.value))
             ? e.target.value
             : parseFloat(e.target.value);
           if (onChange) {
             const modelFields = {
-              name,
-              startingBalance: value,
-              Transactions,
-              type,
+              date,
+              description,
+              amount: value,
+              accountID,
+              Category,
             };
             const result = onChange(modelFields);
-            value = result?.startingBalance ?? value;
+            value = result?.amount ?? value;
           }
-          if (errors.startingBalance?.hasError) {
-            runValidationTasks("startingBalance", value);
+          if (errors.amount?.hasError) {
+            runValidationTasks("amount", value);
           }
-          setStartingBalance(value);
+          setAmount(value);
         }}
-        onBlur={() => runValidationTasks("startingBalance", startingBalance)}
-        errorMessage={errors.startingBalance?.errorMessage}
-        hasError={errors.startingBalance?.hasError}
-        {...getOverrideProps(overrides, "startingBalance")}
+        onBlur={() => runValidationTasks("amount", amount)}
+        errorMessage={errors.amount?.errorMessage}
+        hasError={errors.amount?.hasError}
+        {...getOverrideProps(overrides, "amount")}
       ></TextField>
       <ArrayField
+        lengthLimit={1}
         onChange={async (items) => {
-          let values = items;
+          let value = items[0];
           if (onChange) {
             const modelFields = {
-              name,
-              startingBalance,
-              Transactions: values,
-              type,
+              date,
+              description,
+              amount,
+              accountID: value,
+              Category,
             };
             const result = onChange(modelFields);
-            values = result?.Transactions ?? values;
+            value = result?.accountID ?? value;
           }
-          setTransactions(values);
-          setCurrentTransactionsValue(undefined);
-          setCurrentTransactionsDisplayValue("");
+          setAccountID(value);
+          setCurrentAccountIDValue(undefined);
         }}
-        currentFieldValue={currentTransactionsValue}
-        label={"Transactions"}
-        items={Transactions}
-        hasError={errors?.Transactions?.hasError}
+        currentFieldValue={currentAccountIDValue}
+        label={"Account id"}
+        items={accountID ? [accountID] : []}
+        hasError={errors?.accountID?.hasError}
         runValidationTasks={async () =>
-          await runValidationTasks("Transactions", currentTransactionsValue)
+          await runValidationTasks("accountID", currentAccountIDValue)
         }
-        errorMessage={errors?.Transactions?.errorMessage}
-        getBadgeText={getDisplayValue.Transactions}
-        setFieldValue={(model) => {
-          setCurrentTransactionsDisplayValue(
-            model ? getDisplayValue.Transactions(model) : ""
+        errorMessage={errors?.accountID?.errorMessage}
+        getBadgeText={(value) =>
+          value
+            ? getDisplayValue.accountID(
+                accountRecords.find((r) => r.id === value)
+              )
+            : ""
+        }
+        setFieldValue={(value) => {
+          setCurrentAccountIDDisplayValue(
+            value
+              ? getDisplayValue.accountID(
+                  accountRecords.find((r) => r.id === value)
+                )
+              : ""
           );
-          setCurrentTransactionsValue(model);
+          setCurrentAccountIDValue(value);
         }}
-        inputFieldRef={TransactionsRef}
+        inputFieldRef={accountIDRef}
         defaultFieldValue={""}
       >
         <Autocomplete
-          label="Transactions"
-          isRequired={false}
+          label="Account id"
+          isRequired={true}
           isReadOnly={false}
-          placeholder="Search Transaction"
-          value={currentTransactionsDisplayValue}
-          options={transactionRecords
-            .filter((r) => !TransactionsIdSet.has(getIDValue.Transactions?.(r)))
+          placeholder="Search Account"
+          value={currentAccountIDDisplayValue}
+          options={accountRecords
+            .filter(
+              (r, i, arr) =>
+                arr.findIndex((member) => member?.id === r?.id) === i
+            )
             .map((r) => ({
-              id: getIDValue.Transactions?.(r),
-              label: getDisplayValue.Transactions?.(r),
+              id: r?.id,
+              label: getDisplayValue.accountID?.(r),
             }))}
           onSelect={({ id, label }) => {
-            setCurrentTransactionsValue(
-              transactionRecords.find((r) =>
+            setCurrentAccountIDValue(id);
+            setCurrentAccountIDDisplayValue(label);
+            runValidationTasks("accountID", label);
+          }}
+          onClear={() => {
+            setCurrentAccountIDDisplayValue("");
+          }}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.accountID?.hasError) {
+              runValidationTasks("accountID", value);
+            }
+            setCurrentAccountIDDisplayValue(value);
+            setCurrentAccountIDValue(undefined);
+          }}
+          onBlur={() => runValidationTasks("accountID", currentAccountIDValue)}
+          errorMessage={errors.accountID?.errorMessage}
+          hasError={errors.accountID?.hasError}
+          ref={accountIDRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "accountID")}
+        ></Autocomplete>
+      </ArrayField>
+      <ArrayField
+        lengthLimit={1}
+        onChange={async (items) => {
+          let value = items[0];
+          if (onChange) {
+            const modelFields = {
+              date,
+              description,
+              amount,
+              accountID,
+              Category: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.Category ?? value;
+          }
+          setCategory(value);
+          setCurrentCategoryValue(undefined);
+          setCurrentCategoryDisplayValue("");
+        }}
+        currentFieldValue={currentCategoryValue}
+        label={"Category"}
+        items={Category ? [Category] : []}
+        hasError={errors?.Category?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("Category", currentCategoryValue)
+        }
+        errorMessage={errors?.Category?.errorMessage}
+        getBadgeText={getDisplayValue.Category}
+        setFieldValue={(model) => {
+          setCurrentCategoryDisplayValue(
+            model ? getDisplayValue.Category(model) : ""
+          );
+          setCurrentCategoryValue(model);
+        }}
+        inputFieldRef={CategoryRef}
+        defaultFieldValue={""}
+      >
+        <Autocomplete
+          label="Category"
+          isRequired={false}
+          isReadOnly={false}
+          placeholder="Search Category"
+          value={currentCategoryDisplayValue}
+          options={categoryRecords
+            .filter((r) => !CategoryIdSet.has(getIDValue.Category?.(r)))
+            .map((r) => ({
+              id: getIDValue.Category?.(r),
+              label: getDisplayValue.Category?.(r),
+            }))}
+          onSelect={({ id, label }) => {
+            setCurrentCategoryValue(
+              categoryRecords.find((r) =>
                 Object.entries(JSON.parse(id)).every(
                   ([key, value]) => r[key] === value
                 )
               )
             );
-            setCurrentTransactionsDisplayValue(label);
-            runValidationTasks("Transactions", label);
+            setCurrentCategoryDisplayValue(label);
+            runValidationTasks("Category", label);
           }}
           onClear={() => {
-            setCurrentTransactionsDisplayValue("");
+            setCurrentCategoryDisplayValue("");
           }}
           onChange={(e) => {
             let { value } = e.target;
-            if (errors.Transactions?.hasError) {
-              runValidationTasks("Transactions", value);
+            if (errors.Category?.hasError) {
+              runValidationTasks("Category", value);
             }
-            setCurrentTransactionsDisplayValue(value);
-            setCurrentTransactionsValue(undefined);
+            setCurrentCategoryDisplayValue(value);
+            setCurrentCategoryValue(undefined);
           }}
           onBlur={() =>
-            runValidationTasks("Transactions", currentTransactionsDisplayValue)
+            runValidationTasks("Category", currentCategoryDisplayValue)
           }
-          errorMessage={errors.Transactions?.errorMessage}
-          hasError={errors.Transactions?.hasError}
-          ref={TransactionsRef}
+          errorMessage={errors.Category?.errorMessage}
+          hasError={errors.Category?.hasError}
+          ref={CategoryRef}
           labelHidden={true}
-          {...getOverrideProps(overrides, "Transactions")}
+          {...getOverrideProps(overrides, "Category")}
         ></Autocomplete>
       </ArrayField>
-      <SelectField
-        label="Type"
-        placeholder="Please select an option"
-        isDisabled={false}
-        value={type}
-        onChange={(e) => {
-          let { value } = e.target;
-          if (onChange) {
-            const modelFields = {
-              name,
-              startingBalance,
-              Transactions,
-              type: value,
-            };
-            const result = onChange(modelFields);
-            value = result?.type ?? value;
-          }
-          if (errors.type?.hasError) {
-            runValidationTasks("type", value);
-          }
-          setType(value);
-        }}
-        onBlur={() => runValidationTasks("type", type)}
-        errorMessage={errors.type?.errorMessage}
-        hasError={errors.type?.hasError}
-        {...getOverrideProps(overrides, "type")}
-      >
-        <option
-          children="Checking"
-          value="CHECKING"
-          {...getOverrideProps(overrides, "typeoption0")}
-        ></option>
-        <option
-          children="Savings"
-          value="SAVINGS"
-          {...getOverrideProps(overrides, "typeoption1")}
-        ></option>
-        <option
-          children="Brokerage"
-          value="BROKERAGE"
-          {...getOverrideProps(overrides, "typeoption2")}
-        ></option>
-        <option
-          children="Credit card"
-          value="CREDIT_CARD"
-          {...getOverrideProps(overrides, "typeoption3")}
-        ></option>
-        <option
-          children="Online"
-          value="ONLINE"
-          {...getOverrideProps(overrides, "typeoption4")}
-        ></option>
-      </SelectField>
       <Flex
         justifyContent="space-between"
         {...getOverrideProps(overrides, "CTAFlex")}
       >
         <Button
-          children="Reset"
+          children="Clear"
           type="reset"
           onClick={(event) => {
             event.preventDefault();
             resetStateValues();
           }}
-          isDisabled={!(idProp || accountModelProp)}
-          {...getOverrideProps(overrides, "ResetButton")}
+          {...getOverrideProps(overrides, "ClearButton")}
         ></Button>
         <Flex
           gap="15px"
@@ -613,10 +616,7 @@ export default function AccountUpdateForm(props) {
             children="Submit"
             type="submit"
             variation="primary"
-            isDisabled={
-              !(idProp || accountModelProp) ||
-              Object.values(errors).some((e) => e?.hasError)
-            }
+            isDisabled={Object.values(errors).some((e) => e?.hasError)}
             {...getOverrideProps(overrides, "SubmitButton")}
           ></Button>
         </Flex>

@@ -10,11 +10,11 @@ const AccountType = {
   "ONLINE": "ONLINE"
 };
 
-const { Category, Transaction, Account } = initSchema(schema);
+const { Transaction, Category, Account } = initSchema(schema);
 
 export {
-  Category,
   Transaction,
+  Category,
   Account,
   AccountType
 };

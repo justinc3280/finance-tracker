@@ -1,3 +1,12 @@
+type Transaction @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  date: AWSDate!
+  description: String!
+  amount: Float!
+  accountID: ID! @index(name: "byAccount")
+  Category: Category @hasOne
+}
+
 enum AccountType {
   CHECKING
   SAVINGS
@@ -9,15 +18,6 @@ enum AccountType {
 type Category @model @auth(rules: [{allow: public}]) {
   id: ID!
   name: String!
-}
-
-type Transaction @model @auth(rules: [{allow: public}]) {
-  id: ID!
-  accountID: ID! @index(name: "byAccount")
-  date: AWSDate!
-  description: String!
-  amount: Float!
-  Category: Category @hasOne
 }
 
 type Account @model @auth(rules: [{allow: public}]) {

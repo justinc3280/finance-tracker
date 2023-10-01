@@ -12,6 +12,44 @@ export enum AccountType {
 
 
 
+type EagerTransaction = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Transaction, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly date: string;
+  readonly description: string;
+  readonly amount: number;
+  readonly accountID: string;
+  readonly Category?: Category | null;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly transactionCategoryId?: string | null;
+}
+
+type LazyTransaction = {
+  readonly [__modelMeta__]: {
+    identifier: ManagedIdentifier<Transaction, 'id'>;
+    readOnlyFields: 'createdAt' | 'updatedAt';
+  };
+  readonly id: string;
+  readonly date: string;
+  readonly description: string;
+  readonly amount: number;
+  readonly accountID: string;
+  readonly Category: AsyncItem<Category | undefined>;
+  readonly createdAt?: string | null;
+  readonly updatedAt?: string | null;
+  readonly transactionCategoryId?: string | null;
+}
+
+export declare type Transaction = LazyLoading extends LazyLoadingDisabled ? EagerTransaction : LazyTransaction
+
+export declare const Transaction: (new (init: ModelInit<Transaction>) => Transaction) & {
+  copyOf(source: Transaction, mutator: (draft: MutableModel<Transaction>) => MutableModel<Transaction> | void): Transaction;
+}
+
 type EagerCategory = {
   readonly [__modelMeta__]: {
     identifier: ManagedIdentifier<Category, 'id'>;
@@ -38,44 +76,6 @@ export declare type Category = LazyLoading extends LazyLoadingDisabled ? EagerCa
 
 export declare const Category: (new (init: ModelInit<Category>) => Category) & {
   copyOf(source: Category, mutator: (draft: MutableModel<Category>) => MutableModel<Category> | void): Category;
-}
-
-type EagerTransaction = {
-  readonly [__modelMeta__]: {
-    identifier: ManagedIdentifier<Transaction, 'id'>;
-    readOnlyFields: 'createdAt' | 'updatedAt';
-  };
-  readonly id: string;
-  readonly accountID: string;
-  readonly date: string;
-  readonly description: string;
-  readonly amount: number;
-  readonly Category?: Category | null;
-  readonly createdAt?: string | null;
-  readonly updatedAt?: string | null;
-  readonly transactionCategoryId?: string | null;
-}
-
-type LazyTransaction = {
-  readonly [__modelMeta__]: {
-    identifier: ManagedIdentifier<Transaction, 'id'>;
-    readOnlyFields: 'createdAt' | 'updatedAt';
-  };
-  readonly id: string;
-  readonly accountID: string;
-  readonly date: string;
-  readonly description: string;
-  readonly amount: number;
-  readonly Category: AsyncItem<Category | undefined>;
-  readonly createdAt?: string | null;
-  readonly updatedAt?: string | null;
-  readonly transactionCategoryId?: string | null;
-}
-
-export declare type Transaction = LazyLoading extends LazyLoadingDisabled ? EagerTransaction : LazyTransaction
-
-export declare const Transaction: (new (init: ModelInit<Transaction>) => Transaction) & {
-  copyOf(source: Transaction, mutator: (draft: MutableModel<Transaction>) => MutableModel<Transaction> | void): Transaction;
 }
 
 type EagerAccount = {

@@ -1,5 +1,5 @@
 import { DataStore } from '@aws-amplify/datastore';
-import { Account } from './models';
+import { Account, Transaction } from './models';
 
 
 class BackendInterface {
@@ -14,7 +14,19 @@ class BackendInterface {
     if (!account) return null;
     return account;
   };
+
+  public static getAllTransactions = async () => {
+    const transactions = await DataStore.query(Transaction);
+    if (transactions.length === 0) return null;
+    return transactions;
+  };
+
+  public static getTransactionsForAccount = async (accountID: string) => {
+    const transactions = await DataStore.query(Transaction, (t) => t.accountID.eq(accountID));
+    if (transactions.length === 0) return null;
+    return transactions;
+  };
 };
 
-export { Account };
+export { Account, Transaction };
 export default BackendInterface;

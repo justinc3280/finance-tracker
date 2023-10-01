@@ -8,4 +8,6 @@ export { default as AccountCreateForm } from "./AccountCreateForm";
 export { default as AccountUpdateForm } from "./AccountUpdateForm";
 export { default as CategoryCreateForm } from "./CategoryCreateForm";
 export { default as CategoryUpdateForm } from "./CategoryUpdateForm";
+export { default as TransactionCreateForm } from "./TransactionCreateForm";
+export { default as TransactionUpdateForm } from "./TransactionUpdateForm";
 export { default as studioTheme } from "./studioTheme";

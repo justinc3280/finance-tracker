@@ -5,9 +5,9 @@
  **************************************************************************/
 
 import * as React from "react";
-import { GridProps, SelectFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
+import { AutocompleteProps, GridProps, SelectFieldProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
-import { Account } from "../models";
+import { Account, Transaction } from "../models";
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;
@@ -16,11 +16,13 @@ export declare type ValidationFunction<T> = (value: T, validationResponse: Valid
 export declare type AccountUpdateFormInputValues = {
     name?: string;
     startingBalance?: number;
+    Transactions?: Transaction[];
     type?: string;
 };
 export declare type AccountUpdateFormValidationValues = {
     name?: ValidationFunction<string>;
     startingBalance?: ValidationFunction<number>;
+    Transactions?: ValidationFunction<Transaction>;
     type?: ValidationFunction<string>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
@@ -28,6 +30,7 @@ export declare type AccountUpdateFormOverridesProps = {
     AccountUpdateFormGrid?: PrimitiveOverrideProps<GridProps>;
     name?: PrimitiveOverrideProps<TextFieldProps>;
     startingBalance?: PrimitiveOverrideProps<TextFieldProps>;
+    Transactions?: PrimitiveOverrideProps<AutocompleteProps>;
     type?: PrimitiveOverrideProps<SelectFieldProps>;
 } & EscapeHatchProps;
 export declare type AccountUpdateFormProps = React.PropsWithChildren<{
