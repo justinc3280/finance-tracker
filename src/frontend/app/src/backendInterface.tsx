@@ -1,4 +1,4 @@
-import { DataStore } from '@aws-amplify/datastore';
+import { DataStore, Predicates, SortDirection } from '@aws-amplify/datastore';
 import { Account, Transaction } from './models';
 
 
@@ -16,13 +16,19 @@ class BackendInterface {
   };
 
   public static getAllTransactions = async () => {
-    const transactions = await DataStore.query(Transaction);
+    const transactions = await DataStore.query(Transaction, Predicates.ALL, {
+      sort: (s) => s.date(SortDirection.ASCENDING),
+    });
     if (transactions.length === 0) return null;
     return transactions;
   };
 
   public static getTransactionsForAccount = async (accountID: string) => {
-    const transactions = await DataStore.query(Transaction, (t) => t.accountID.eq(accountID));
+    const transactions = await DataStore.query(Transaction,
+      (t) => t.accountID.eq(accountID), {
+        sort: (s) => s.date(SortDirection.ASCENDING),
+      }
+    );
     if (transactions.length === 0) return null;
     return transactions;
   };

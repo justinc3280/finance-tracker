@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import BackendInterface, { Account, Transaction } from '../../../backendInterface';
 import Page from '../../page/Page';
+import TrasactionsTable from '../../transactions-table/TransactionsTable';
 
 
 const AccountPage: React.FC = () => {
@@ -42,13 +43,8 @@ const AccountPage: React.FC = () => {
           <h1>{account.name}</h1>
           <h3>Transactions</h3>
           {transactions ?
-            <ul>
-              {transactions.map((transaction) =>
-                <li key={transaction.id}>{transaction.description}</li>
-              )}
-            </ul>
-          :
-            <p>No transactions found.</p>
+            <TrasactionsTable transactions={transactions} />
+            : <p>No transactions found.</p>
           }
         </div>
       }

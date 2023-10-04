@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Page from '../../page/Page';
 import BackendInterface, { Transaction } from '../../../backendInterface';
+import TrasactionsTable from '../../transactions-table/TransactionsTable';
+
 
 const TransactionsPage: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[] | null | undefined>(undefined);
@@ -16,12 +18,9 @@ const TransactionsPage: React.FC = () => {
   return (
     <Page>
       <h1>Transactions</h1>
-      {transactions &&
-        <ul>
-          {transactions.map((transaction) =>
-            <li key={transaction.id}>{transaction.description}</li>
-          )}
-        </ul>
+      {transactions ?
+        <TrasactionsTable transactions={transactions} />
+        : <p>No transactions found.</p>
       }
     </Page>
   );
