@@ -6,7 +6,7 @@ import BackendInterface, { Account } from '../../../backendInterface';
 import Button from 'react-bootstrap/Button';
 import Page from '../../page/Page';
 import { Card } from 'react-bootstrap';
-import CreateAccountModal from '../../modals/create-account-modal/CreateAccountModal';
+import CreateAccountModal from '../../modals/CreateAccountModal';
 
 
 const AccountsPage: React.FC = () => {

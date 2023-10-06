@@ -1,8 +1,7 @@
-
 import React from "react";
 import Modal from "react-bootstrap/Modal";
 
-import AccountCreateForm from "../../../ui-components/AccountCreateForm";
+import AccountCreateForm from "../../ui-components/AccountCreateForm";
 
 type Props = {
   show: boolean;
