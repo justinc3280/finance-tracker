@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import BackendInterface, { Account, Transaction } from '../../../backendInterface';
+import BackendInterface, { Account } from '../../../backendInterface';
+import { Transaction } from '../../../types';
 import Page from '../../page/Page';
 import TrasactionsTable from '../../transactions-table/TransactionsTable';
 

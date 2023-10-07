@@ -23,6 +23,7 @@ type EagerTransaction = {
   readonly amount: number;
   readonly accountID: string;
   readonly Category?: Category | null;
+  readonly Account: Account;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly transactionCategoryId?: string | null;
@@ -39,6 +40,7 @@ type LazyTransaction = {
   readonly amount: number;
   readonly accountID: string;
   readonly Category: AsyncItem<Category | undefined>;
+  readonly Account: AsyncItem<Account>;
   readonly createdAt?: string | null;
   readonly updatedAt?: string | null;
   readonly transactionCategoryId?: string | null;

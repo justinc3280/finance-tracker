@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Page from '../../page/Page';
-import BackendInterface, { Transaction } from '../../../backendInterface';
+import BackendInterface from '../../../backendInterface';
+import { Transaction } from '../../../types';
 import CreateTransactionModal from '../../modals/CreateTransactionModal';
 import TrasactionsTable from '../../transactions-table/TransactionsTable';
 
@@ -10,7 +11,7 @@ const TransactionsPage: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[] | null | undefined>(undefined);
   useEffect(() => {
     const getTransactions = async () => {
-      const transactions = await BackendInterface.getAllTransactions();
+      const transactions = await BackendInterface.getAllTransactions(true);
       setTransactions(transactions);
     };
 
@@ -43,7 +44,7 @@ const TransactionsPage: React.FC = () => {
         <h1>Transactions</h1>
       </div>
       {transactions ?
-        <TrasactionsTable transactions={transactions} />
+        <TrasactionsTable transactions={transactions} showAccountName />
         : <p>No transactions found.</p>
       }
       <CreateTransactionModal show={showCreateTransactionModal} handleClose={handleModalClose} onSuccess={onTransactionCreated} />

@@ -56,6 +56,21 @@ export const schema = {
                         ]
                     }
                 },
+                "Account": {
+                    "name": "Account",
+                    "isArray": false,
+                    "type": {
+                        "model": "Account"
+                    },
+                    "isRequired": true,
+                    "attributes": [],
+                    "association": {
+                        "connectionType": "BELONGS_TO",
+                        "targetNames": [
+                            "accountID"
+                        ]
+                    }
+                },
                 "createdAt": {
                     "name": "createdAt",
                     "isArray": false,
@@ -209,7 +224,7 @@ export const schema = {
                     "association": {
                         "connectionType": "HAS_MANY",
                         "associatedWith": [
-                            "accountID"
+                            "Account"
                         ]
                     }
                 },
@@ -279,5 +294,5 @@ export const schema = {
     },
     "nonModels": {},
     "codegenVersion": "3.4.4",
-    "version": "0bb4693127c0f87fd8d167fcd6491f20"
+    "version": "0d73845ba8a8b499cd7d796726432505"
 };

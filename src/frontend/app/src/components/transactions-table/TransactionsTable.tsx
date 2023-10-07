@@ -6,7 +6,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { Transaction } from "../../backendInterface";
+import { Transaction } from "../../types";
 
 
 const columnHelper = createColumnHelper<Transaction>()
@@ -23,18 +23,27 @@ const columns = [
   columnHelper.accessor('description', {
     header: 'Description',
   }),
+  columnHelper.accessor('accountName', {
+    header: 'Account',
+  }),
 ];
 
 type Props = {
   transactions: Transaction[];
+  showAccountName?: boolean;
 }
 
-const TrasactionsTable: React.FC<Props> = ({ transactions }) => {
+const TrasactionsTable: React.FC<Props> = ({ transactions, showAccountName }) => {
 
   const table = useReactTable<Transaction>({
     data: transactions,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    initialState: {
+      columnVisibility: {
+        accountName: showAccountName || false,
+      },
+    },
   })
 
   return (

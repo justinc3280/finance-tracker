@@ -23,7 +23,11 @@ import {
   getOverrideProps,
   useDataStoreBinding,
 } from "@aws-amplify/ui-react/internal";
-import { Transaction, Category as Category0, Account } from "../models";
+import {
+  Transaction,
+  Category as Category0,
+  Account as Account0,
+} from "../models";
 import { fetchByPath, validateField } from "./utils";
 import { DataStore } from "aws-amplify";
 function ArrayField({
@@ -197,30 +201,30 @@ export default function TransactionUpdateForm(props) {
     date: "",
     description: "",
     amount: "",
-    accountID: undefined,
     Category: undefined,
+    Account: undefined,
   };
   const [date, setDate] = React.useState(initialValues.date);
   const [description, setDescription] = React.useState(
     initialValues.description
   );
   const [amount, setAmount] = React.useState(initialValues.amount);
-  const [accountID, setAccountID] = React.useState(initialValues.accountID);
   const [Category, setCategory] = React.useState(initialValues.Category);
+  const [Account, setAccount] = React.useState(initialValues.Account);
   const [errors, setErrors] = React.useState({});
   const resetStateValues = () => {
     const cleanValues = transactionRecord
-      ? { ...initialValues, ...transactionRecord, accountID, Category }
+      ? { ...initialValues, ...transactionRecord, Category, Account }
       : initialValues;
     setDate(cleanValues.date);
     setDescription(cleanValues.description);
     setAmount(cleanValues.amount);
-    setAccountID(cleanValues.accountID);
-    setCurrentAccountIDValue(undefined);
-    setCurrentAccountIDDisplayValue("");
     setCategory(cleanValues.Category);
     setCurrentCategoryValue(undefined);
     setCurrentCategoryDisplayValue("");
+    setAccount(cleanValues.Account);
+    setCurrentAccountValue(undefined);
+    setCurrentAccountDisplayValue("");
     setErrors({});
   };
   const [transactionRecord, setTransactionRecord] =
@@ -231,50 +235,56 @@ export default function TransactionUpdateForm(props) {
         ? await DataStore.query(Transaction, idProp)
         : transactionModelProp;
       setTransactionRecord(record);
-      const accountIDRecord = record ? await record.accountID : undefined;
-      setAccountID(accountIDRecord);
       const CategoryRecord = record ? await record.Category : undefined;
       setCategory(CategoryRecord);
+      const AccountRecord = record ? await record.Account : undefined;
+      setAccount(AccountRecord);
     };
     queryData();
   }, [idProp, transactionModelProp]);
-  React.useEffect(resetStateValues, [transactionRecord, accountID, Category]);
-  const [currentAccountIDDisplayValue, setCurrentAccountIDDisplayValue] =
-    React.useState("");
-  const [currentAccountIDValue, setCurrentAccountIDValue] =
-    React.useState(undefined);
-  const accountIDRef = React.createRef();
+  React.useEffect(resetStateValues, [transactionRecord, Category, Account]);
   const [currentCategoryDisplayValue, setCurrentCategoryDisplayValue] =
     React.useState("");
   const [currentCategoryValue, setCurrentCategoryValue] =
     React.useState(undefined);
   const CategoryRef = React.createRef();
+  const [currentAccountDisplayValue, setCurrentAccountDisplayValue] =
+    React.useState("");
+  const [currentAccountValue, setCurrentAccountValue] =
+    React.useState(undefined);
+  const AccountRef = React.createRef();
   const getIDValue = {
     Category: (r) => JSON.stringify({ id: r?.id }),
+    Account: (r) => JSON.stringify({ id: r?.id }),
   };
   const CategoryIdSet = new Set(
     Array.isArray(Category)
       ? Category.map((r) => getIDValue.Category?.(r))
       : getIDValue.Category?.(Category)
   );
-  const accountRecords = useDataStoreBinding({
-    type: "collection",
-    model: Account,
-  }).items;
+  const AccountIdSet = new Set(
+    Array.isArray(Account)
+      ? Account.map((r) => getIDValue.Account?.(r))
+      : getIDValue.Account?.(Account)
+  );
   const categoryRecords = useDataStoreBinding({
     type: "collection",
     model: Category0,
   }).items;
+  const accountRecords = useDataStoreBinding({
+    type: "collection",
+    model: Account0,
+  }).items;
   const getDisplayValue = {
-    accountID: (r) => `${r?.name ? r?.name + " - " : ""}${r?.id}`,
     Category: (r) => `${r?.name ? r?.name + " - " : ""}${r?.id}`,
+    Account: (r) => `${r?.name ? r?.name + " - " : ""}${r?.id}`,
   };
   const validations = {
     date: [{ type: "Required" }],
     description: [{ type: "Required" }],
     amount: [{ type: "Required" }],
-    accountID: [{ type: "Required" }],
     Category: [],
+    Account: [{ type: "Required", validationMessage: "Account is required." }],
   };
   const runValidationTasks = async (
     fieldName,
@@ -305,8 +315,8 @@ export default function TransactionUpdateForm(props) {
           date,
           description,
           amount,
-          accountID,
           Category,
+          Account,
         };
         const validationResponses = await Promise.all(
           Object.keys(validations).reduce((promises, fieldName) => {
@@ -350,6 +360,9 @@ export default function TransactionUpdateForm(props) {
               if (!modelFields.Category) {
                 updated.transactionCategoryId = undefined;
               }
+              if (!modelFields.Account) {
+                updated.accountID = undefined;
+              }
             })
           );
           if (onSuccess) {
@@ -377,8 +390,8 @@ export default function TransactionUpdateForm(props) {
               date: value,
               description,
               amount,
-              accountID,
               Category,
+              Account,
             };
             const result = onChange(modelFields);
             value = result?.date ?? value;
@@ -405,8 +418,8 @@ export default function TransactionUpdateForm(props) {
               date,
               description: value,
               amount,
-              accountID,
               Category,
+              Account,
             };
             const result = onChange(modelFields);
             value = result?.description ?? value;
@@ -437,8 +450,8 @@ export default function TransactionUpdateForm(props) {
               date,
               description,
               amount: value,
-              accountID,
               Category,
+              Account,
             };
             const result = onChange(modelFields);
             value = result?.amount ?? value;
@@ -462,94 +475,8 @@ export default function TransactionUpdateForm(props) {
               date,
               description,
               amount,
-              accountID: value,
-              Category,
-            };
-            const result = onChange(modelFields);
-            value = result?.accountID ?? value;
-          }
-          setAccountID(value);
-          setCurrentAccountIDValue(undefined);
-        }}
-        currentFieldValue={currentAccountIDValue}
-        label={"Account id"}
-        items={accountID ? [accountID] : []}
-        hasError={errors?.accountID?.hasError}
-        runValidationTasks={async () =>
-          await runValidationTasks("accountID", currentAccountIDValue)
-        }
-        errorMessage={errors?.accountID?.errorMessage}
-        getBadgeText={(value) =>
-          value
-            ? getDisplayValue.accountID(
-                accountRecords.find((r) => r.id === value)
-              )
-            : ""
-        }
-        setFieldValue={(value) => {
-          setCurrentAccountIDDisplayValue(
-            value
-              ? getDisplayValue.accountID(
-                  accountRecords.find((r) => r.id === value)
-                )
-              : ""
-          );
-          setCurrentAccountIDValue(value);
-        }}
-        inputFieldRef={accountIDRef}
-        defaultFieldValue={""}
-      >
-        <Autocomplete
-          label="Account id"
-          isRequired={true}
-          isReadOnly={false}
-          placeholder="Search Account"
-          value={currentAccountIDDisplayValue}
-          options={accountRecords
-            .filter(
-              (r, i, arr) =>
-                arr.findIndex((member) => member?.id === r?.id) === i
-            )
-            .map((r) => ({
-              id: r?.id,
-              label: getDisplayValue.accountID?.(r),
-            }))}
-          onSelect={({ id, label }) => {
-            setCurrentAccountIDValue(id);
-            setCurrentAccountIDDisplayValue(label);
-            runValidationTasks("accountID", label);
-          }}
-          onClear={() => {
-            setCurrentAccountIDDisplayValue("");
-          }}
-          defaultValue={accountID}
-          onChange={(e) => {
-            let { value } = e.target;
-            if (errors.accountID?.hasError) {
-              runValidationTasks("accountID", value);
-            }
-            setCurrentAccountIDDisplayValue(value);
-            setCurrentAccountIDValue(undefined);
-          }}
-          onBlur={() => runValidationTasks("accountID", currentAccountIDValue)}
-          errorMessage={errors.accountID?.errorMessage}
-          hasError={errors.accountID?.hasError}
-          ref={accountIDRef}
-          labelHidden={true}
-          {...getOverrideProps(overrides, "accountID")}
-        ></Autocomplete>
-      </ArrayField>
-      <ArrayField
-        lengthLimit={1}
-        onChange={async (items) => {
-          let value = items[0];
-          if (onChange) {
-            const modelFields = {
-              date,
-              description,
-              amount,
-              accountID,
               Category: value,
+              Account,
             };
             const result = onChange(modelFields);
             value = result?.Category ?? value;
@@ -619,6 +546,88 @@ export default function TransactionUpdateForm(props) {
           ref={CategoryRef}
           labelHidden={true}
           {...getOverrideProps(overrides, "Category")}
+        ></Autocomplete>
+      </ArrayField>
+      <ArrayField
+        lengthLimit={1}
+        onChange={async (items) => {
+          let value = items[0];
+          if (onChange) {
+            const modelFields = {
+              date,
+              description,
+              amount,
+              Category,
+              Account: value,
+            };
+            const result = onChange(modelFields);
+            value = result?.Account ?? value;
+          }
+          setAccount(value);
+          setCurrentAccountValue(undefined);
+          setCurrentAccountDisplayValue("");
+        }}
+        currentFieldValue={currentAccountValue}
+        label={"Account"}
+        items={Account ? [Account] : []}
+        hasError={errors?.Account?.hasError}
+        runValidationTasks={async () =>
+          await runValidationTasks("Account", currentAccountValue)
+        }
+        errorMessage={errors?.Account?.errorMessage}
+        getBadgeText={getDisplayValue.Account}
+        setFieldValue={(model) => {
+          setCurrentAccountDisplayValue(
+            model ? getDisplayValue.Account(model) : ""
+          );
+          setCurrentAccountValue(model);
+        }}
+        inputFieldRef={AccountRef}
+        defaultFieldValue={""}
+      >
+        <Autocomplete
+          label="Account"
+          isRequired={true}
+          isReadOnly={false}
+          placeholder="Search Account"
+          value={currentAccountDisplayValue}
+          options={accountRecords
+            .filter((r) => !AccountIdSet.has(getIDValue.Account?.(r)))
+            .map((r) => ({
+              id: getIDValue.Account?.(r),
+              label: getDisplayValue.Account?.(r),
+            }))}
+          onSelect={({ id, label }) => {
+            setCurrentAccountValue(
+              accountRecords.find((r) =>
+                Object.entries(JSON.parse(id)).every(
+                  ([key, value]) => r[key] === value
+                )
+              )
+            );
+            setCurrentAccountDisplayValue(label);
+            runValidationTasks("Account", label);
+          }}
+          onClear={() => {
+            setCurrentAccountDisplayValue("");
+          }}
+          defaultValue={Account}
+          onChange={(e) => {
+            let { value } = e.target;
+            if (errors.Account?.hasError) {
+              runValidationTasks("Account", value);
+            }
+            setCurrentAccountDisplayValue(value);
+            setCurrentAccountValue(undefined);
+          }}
+          onBlur={() =>
+            runValidationTasks("Account", currentAccountDisplayValue)
+          }
+          errorMessage={errors.Account?.errorMessage}
+          hasError={errors.Account?.hasError}
+          ref={AccountRef}
+          labelHidden={true}
+          {...getOverrideProps(overrides, "Account")}
         ></Autocomplete>
       </ArrayField>
       <Flex

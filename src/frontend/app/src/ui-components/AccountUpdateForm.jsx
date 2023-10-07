@@ -356,13 +356,13 @@ export default function AccountUpdateForm(props) {
           transactionsToUnLink.forEach((original) => {
             if (!canUnlinkTransactions) {
               throw Error(
-                `Transaction ${original.id} cannot be unlinked from Account because accountID is a required field.`
+                `Transaction ${original.id} cannot be unlinked from Account because undefined is a required field.`
               );
             }
             promises.push(
               DataStore.save(
                 Transaction.copyOf(original, (updated) => {
-                  updated.accountID = null;
+                  updated.Account = null;
                 })
               )
             );
@@ -371,7 +371,7 @@ export default function AccountUpdateForm(props) {
             promises.push(
               DataStore.save(
                 Transaction.copyOf(original, (updated) => {
-                  updated.accountID = accountRecord.id;
+                  updated.Account = accountRecord;
                 })
               )
             );

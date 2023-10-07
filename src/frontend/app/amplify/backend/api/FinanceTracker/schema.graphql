@@ -5,6 +5,7 @@ type Transaction @model @auth(rules: [{allow: public}]) {
   amount: Float!
   accountID: ID! @index(name: "byAccount")
   Category: Category @hasOne
+  Account: Account! @belongsTo(fields: ["accountID"])
 }
 
 enum AccountType {

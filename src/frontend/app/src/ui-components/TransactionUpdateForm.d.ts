@@ -7,7 +7,7 @@
 import * as React from "react";
 import { AutocompleteProps, GridProps, TextFieldProps } from "@aws-amplify/ui-react";
 import { EscapeHatchProps } from "@aws-amplify/ui-react/internal";
-import { Transaction, Category as Category0 } from "../models";
+import { Transaction, Category as Category0, Account as Account0 } from "../models";
 export declare type ValidationResponse = {
     hasError: boolean;
     errorMessage?: string;
@@ -17,15 +17,15 @@ export declare type TransactionUpdateFormInputValues = {
     date?: string;
     description?: string;
     amount?: number;
-    accountID?: string;
     Category?: Category0;
+    Account?: Account0;
 };
 export declare type TransactionUpdateFormValidationValues = {
     date?: ValidationFunction<string>;
     description?: ValidationFunction<string>;
     amount?: ValidationFunction<number>;
-    accountID?: ValidationFunction<string>;
     Category?: ValidationFunction<Category0>;
+    Account?: ValidationFunction<Account0>;
 };
 export declare type PrimitiveOverrideProps<T> = Partial<T> & React.DOMAttributes<HTMLDivElement>;
 export declare type TransactionUpdateFormOverridesProps = {
@@ -33,8 +33,8 @@ export declare type TransactionUpdateFormOverridesProps = {
     date?: PrimitiveOverrideProps<TextFieldProps>;
     description?: PrimitiveOverrideProps<TextFieldProps>;
     amount?: PrimitiveOverrideProps<TextFieldProps>;
-    accountID?: PrimitiveOverrideProps<AutocompleteProps>;
     Category?: PrimitiveOverrideProps<AutocompleteProps>;
+    Account?: PrimitiveOverrideProps<AutocompleteProps>;
 } & EscapeHatchProps;
 export declare type TransactionUpdateFormProps = React.PropsWithChildren<{
     overrides?: TransactionUpdateFormOverridesProps | undefined | null;
