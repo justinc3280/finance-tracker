@@ -1,3 +1,8 @@
+export type Category = {
+  id: string;
+  name: string;
+}
+
 export type Transaction = {
   id: string;
   date: string;

@@ -1,6 +1,6 @@
 import { DataStore, Predicates, SortDirection } from '@aws-amplify/datastore';
-import { Account, Transaction as TransactionModel } from './models';
-import { Transaction } from './types';
+import { Account, Category as CategoryModel, Transaction as TransactionModel } from './models';
+import { Category, Transaction } from './types';
 
 
 class BackendInterface {
@@ -15,6 +15,21 @@ class BackendInterface {
     if (!account) return null;
     return account;
   };
+
+  public static getCategories = async () => {
+    const categorieModels = await DataStore.query(CategoryModel);
+    if (categorieModels.length === 0) return null;
+
+    const categories: Category[] = [];
+    for (const categoryModel of categorieModels) {
+      categories.push({
+        id: categoryModel.id,
+        name: categoryModel.name,
+      });
+    };
+
+    return categories;
+  }
 
   public static getAllTransactions = async (includeAccountName: boolean = false) => {
     const transactionModels = await DataStore.query(TransactionModel, Predicates.ALL, {
